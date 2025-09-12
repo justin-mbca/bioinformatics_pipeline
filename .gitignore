@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# R data and history files
+*.RData
+*.Rhistory
+*.Rproj.user/
+
+# Data files
+*.fastq
+*.bam
+*.sam
+*.vcf
+*.h5
+*.loom
+*.csv
+*.tsv
+*.xlsx
+*.log
+*.out
+*.aux
+*.tmp
+*.bak
+
+# Workflow outputs
+results/
+output/
+
+# Environment files
+.venv/
+.env
+.DS_Store
