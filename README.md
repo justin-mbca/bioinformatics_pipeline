@@ -4,7 +4,7 @@ This project provides a modular framework for developing and optimizing bioinfor
 
 ## Features
 - Bulk RNA-Seq analysis (DESeq2, cohort analysis)
-- Single-cell RNA-Seq analysis (Seurat, R)
+- **Single-cell RNA-Seq analysis (Seurat, R) with demo data and automated workflow**
 - Interactive data visualization (Plotly Dash, Shiny)
 - Workflow management (Snakemake, Nextflow)
 - Protocols, SOPs, and QC reporting
@@ -12,10 +12,42 @@ This project provides a modular framework for developing and optimizing bioinfor
 
 ## Project Structure
 - `rna_seq/` — Bulk RNA-Seq analysis scripts and pipelines
-- `single_cell/` — Single-cell RNA-Seq analysis scripts and pipelines
+- `scrna_seq/` — Single-cell RNA-Seq analysis scripts, demo data, and results (Seurat, R)
 - `visualization/` — Interactive visualization tools (Dash, Shiny)
 - `workflows/` — Workflow management scripts (Snakemake, Nextflow)
 - `docs/` — Protocols, SOPs, and documentation
+## Single-cell RNA-Seq Analysis Pipeline (Seurat)
+
+This pipeline demonstrates end-to-end single-cell RNA-Seq analysis using the Seurat R package, including:
+- Data loading (10x Genomics format, with demo data provided)
+- Quality control and filtering (tuned for synthetic data)
+- Normalization and feature selection
+- Dimensionality reduction (PCA, UMAP)
+- Clustering (with adjustable resolution)
+- Marker gene identification
+- Visualization (UMAP, feature plots)
+
+### How to Run the Demo
+1. Activate your R environment with Seurat and tidyverse installed.
+2. From the project root, run:
+   ```bash
+   cd scrna_seq
+   Rscript scrna_seq_analysis.R
+   ```
+3. Results (plots, marker genes, Seurat object) will be saved in `scrna_seq/results/`.
+
+### Demo Data
+- Demo 10x-style dataset (500 genes × 50 cells, realistic sparse counts) is included in `scrna_seq/data/demo_10x/`.
+- The pipeline is tuned to work with this synthetic data, but can be adapted for real datasets.
+
+### How to Demonstrate to a Hiring Manager
+- **Show the code and README:** Highlight the modular, reproducible workflow and clear documentation.
+- **Run the demo live:** Execute the pipeline as above and show the generated UMAP and feature plots in `scrna_seq/results/`.
+- **Explain the steps:** Walk through the R script and describe each analysis stage (QC, normalization, clustering, marker detection).
+- **Discuss extensibility:** Point out how the pipeline can be adapted for larger or real datasets, and how parameters (e.g., clustering resolution) can be tuned.
+- **Highlight best practices:** Emphasize workflow automation, code clarity, and the inclusion of demo data for reproducibility.
+
+For more details, see `scrna_seq/README.md` and the R script.
 
 ## Getting Started
 1. Clone the repository and set up your Python and R environments.
@@ -114,3 +146,64 @@ This repository is designed for extensibility. Planned and possible future enhan
 - **User-friendly Interfaces:** Add GUIs or web interfaces for non-technical users.
 
 Contributions and suggestions for new features are welcome!
+
+## Integration Plan: Bulk and Single-cell RNA-Seq Analysis
+
+Integrating bulk and single-cell RNA-Seq analyses provides a comprehensive view of gene expression, enabling both population-level and cell-type-specific insights. Here’s a practical integration plan you can present or implement:
+
+### 1. Independent Analysis
+- Run bulk RNA-Seq and single-cell RNA-Seq pipelines separately to obtain:
+  - Differentially expressed (DE) genes from bulk (e.g., DESeq2 results)
+  - Cluster-specific marker genes from single-cell (e.g., Seurat markers)
+
+### 2. Comparative Analysis
+- Compare DE genes from bulk with marker genes from single-cell clusters:
+  - Identify which cell types or clusters drive the bulk expression changes.
+  - Use Venn diagrams or heatmaps to visualize overlap.
+
+### 3. Deconvolution
+- Use single-cell data to deconvolute bulk RNA-Seq samples:
+  - Estimate cell type proportions in bulk samples using single-cell reference profiles (e.g., CIBERSORTx, MuSiC).
+
+### 4. Cross-validation
+- Validate findings from one platform with the other:
+  - Confirm bulk DE genes are expressed in relevant single-cell clusters.
+  - Use single-cell data to interpret ambiguous bulk results.
+
+### 5. Multi-omics Integration (Optional)
+- Integrate with other omics data (e.g., proteomics, ATAC-seq) for deeper insights.
+
+### 6. Reporting & Visualization
+- Summarize integrated findings in joint plots, tables, and reports.
+- Highlight how single-cell data refines or explains bulk results.
+
+---
+
+**Tip for Demonstration:**
+- Show how your modular pipeline structure supports integration (e.g., by exporting results to common formats).
+- Discuss how you would automate or script the comparative and deconvolution steps for real projects.
+- Mention tools/packages you would use (e.g., Seurat, DESeq2, CIBERSORTx, custom R/Python scripts).
+
+This plan demonstrates both technical skill and strategic thinking for modern bioinformatics projects.
+
+## Methods Overview
+
+### Bulk RNA-Seq (DESeq2)
+- **Normalization:** Adjusts for sequencing depth and RNA composition using size factors.
+- **Statistical Model:** Models gene counts with a negative binomial distribution to account for biological and technical variability.
+- **Differential Expression:** Uses hypothesis testing (Wald test or likelihood ratio test) to identify genes with significant expression changes between conditions.
+- **Multiple Testing Correction:** Adjusts p-values (e.g., Benjamini-Hochberg) to control the false discovery rate.
+- **Visualization:** Volcano and MA plots display the magnitude and significance of gene expression changes.
+
+### Single-cell RNA-Seq (Seurat)
+- **Quality Control:** Filters cells based on gene/cell counts and mitochondrial content to remove low-quality cells.
+- **Normalization:** Log-normalizes counts to account for sequencing depth per cell.
+- **Feature Selection:** Identifies highly variable genes for downstream analysis.
+- **Dimensionality Reduction:** Uses PCA to reduce noise and UMAP/tSNE for visualization.
+- **Clustering:** Constructs a nearest-neighbor graph and applies the Louvain or Leiden algorithm to find cell clusters.
+- **Marker Gene Detection:** Finds genes specifically expressed in each cluster using statistical tests (e.g., Wilcoxon rank-sum).
+
+### Integration
+- **Comparative Analysis:** Compares DE genes from bulk with marker genes from single-cell clusters to link population-level changes to specific cell types.
+- **Deconvolution:** Uses single-cell profiles to estimate cell type proportions in bulk samples (tools: CIBERSORTx, MuSiC).
+- **Cross-validation:** Confirms findings across data types for robust biological interpretation.
