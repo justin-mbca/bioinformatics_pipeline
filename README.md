@@ -129,7 +129,6 @@ This diagram summarizes the flow of data and analysis steps in the bulk RNA-Seq 
 
 This repository is designed for extensibility. Planned and possible future enhancements include:
 
-- **Single-cell RNA-Seq Analysis:** Integrate Seurat-based workflows for single-cell data processing and visualization.
 - **Multi-omics Integration:** Add support for proteomics, metabolomics, or other omics data types.
 - **Advanced Visualization:** Expand interactive dashboards (Dash, Shiny) for deeper data exploration.
 - **Cloud & HPC Support:** Enable execution on cloud platforms or high-performance computing clusters.
