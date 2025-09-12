@@ -2,3 +2,7 @@ pandas
 matplotlib
 numpy
 snakemake
+
+dash
+plotly
+scikit-learn

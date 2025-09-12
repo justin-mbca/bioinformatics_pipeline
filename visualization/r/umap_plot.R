@@ -1,0 +1,5 @@
+# UMAP Plot in R for single-cell RNA-Seq (Seurat)
+library(Seurat)
+library(ggplot2)
+seurat_obj <- readRDS("../../scrna_seq/results/seurat_obj.rds")
+DimPlot(seurat_obj, reduction = "umap", label = TRUE) + theme_minimal()
