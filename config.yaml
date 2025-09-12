@@ -1,0 +1,15 @@
+# config.yaml - Example configuration for Snakemake RNA-Seq pipeline
+
+# Input files
+counts: ../rna_seq/sample_counts.csv
+gene_annotation: ../rna_seq/gene_annotation.csv
+
+# Output files
+qc_report: ../rna_seq/qc_report.csv
+deseq2_results: ../rna_seq/deseq2_results.csv
+annotated_results: ../rna_seq/annotated_results.csv
+volcano_plot: ../rna_seq/volcano_plot.png
+
+# DESeq2 parameters
+alpha: 0.05
+log2fc_threshold: 1.0

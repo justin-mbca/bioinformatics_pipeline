@@ -1,0 +1,37 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job             count
+------------  -------
+all                 1
+annotate            1
+volcano_plot        1
+total               3
+
+Select jobs to execute...
+
+[Fri Sep 12 14:21:36 2025]
+rule annotate:
+    input: ../rna_seq/deseq2_results.csv
+    output: ../rna_seq/annotated_results.csv
+    jobid: 1
+    reason: Missing output files: ../rna_seq/annotated_results.csv
+    resources: tmpdir=/var/folders/db/dkqv3mq12fg2m2pqjzjx0_700000gn/T
+
+/Users/justin/bioinformatics_pipeline/.venv/bin/python3 /Users/justin/bioinformatics_pipeline/workflows/.snakemake/scripts/tmpdk710zd2.annotate_results.py
+[Fri Sep 12 14:21:37 2025]
+Error in rule annotate:
+    jobid: 1
+    input: ../rna_seq/deseq2_results.csv
+    output: ../rna_seq/annotated_results.csv
+
+RuleException:
+CalledProcessError in file /Users/justin/bioinformatics_pipeline/workflows/Snakefile, line 35:
+Command 'set -euo pipefail;  /Users/justin/bioinformatics_pipeline/.venv/bin/python3 /Users/justin/bioinformatics_pipeline/workflows/.snakemake/scripts/tmpdk710zd2.annotate_results.py' returned non-zero exit status 1.
+  File "/Users/justin/bioinformatics_pipeline/workflows/Snakefile", line 35, in __rule_annotate
+  File "/Users/justin/.pyenv/versions/3.10.13/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2025-09-12T142136.867819.snakemake.log

@@ -1,0 +1,6 @@
+Building DAG of jobs...
+MissingInputException in rule annotate in file /Users/justin/bioinformatics_pipeline/workflows/Snakefile, line 29:
+Missing input files for rule annotate:
+    output: ../rna_seq/annotated_results.csv
+    affected files:
+        ../rna_seq/gene_annotation.csv
