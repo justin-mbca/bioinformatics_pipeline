@@ -40,14 +40,6 @@ This pipeline demonstrates end-to-end single-cell RNA-Seq analysis using the Seu
 - Demo 10x-style dataset (500 genes × 50 cells, realistic sparse counts) is included in `scrna_seq/data/demo_10x/`.
 - The pipeline is tuned to work with this synthetic data, but can be adapted for real datasets.
 
-### How to Demonstrate to a Hiring Manager
-- **Show the code and README:** Highlight the modular, reproducible workflow and clear documentation.
-- **Run the demo live:** Execute the pipeline as above and show the generated UMAP and feature plots in `scrna_seq/results/`.
-- **Explain the steps:** Walk through the R script and describe each analysis stage (QC, normalization, clustering, marker detection).
-- **Discuss extensibility:** Point out how the pipeline can be adapted for larger or real datasets, and how parameters (e.g., clustering resolution) can be tuned.
-- **Highlight best practices:** Emphasize workflow automation, code clarity, and the inclusion of demo data for reproducibility.
-
-For more details, see `scrna_seq/README.md` and the R script.
 
 ## Getting Started
 1. Clone the repository and set up your Python and R environments.
