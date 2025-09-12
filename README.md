@@ -1,200 +1,142 @@
-# Bioinformatics Pipeline
+# Bioinformatics Analysis Pipeline
 
-This project provides a modular framework for developing and optimizing bioinformatics tools and pipelines, with a focus on RNA-Seq and single-cell RNA-Seq analysis, cohort analysis, and interactive data visualization. It is designed for collaboration with laboratory scientists and supports drug discovery initiatives.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Snakemake](https://img.shields.io/badge/Snakemake-≥5.7.0-brightgreen.svg)](https://snakemake.github.io)
+[![R](https://img.shields.io/badge/R-≥4.0.0-blue.svg)](https://www.r-project.org/)
 
-## Features
-- Bulk RNA-Seq analysis (DESeq2, cohort analysis)
-- **Single-cell RNA-Seq analysis (Seurat, R) with demo data and automated workflow**
-- Interactive data visualization (Plotly Dash, Shiny)
-- Workflow management (Snakemake, Nextflow)
-- Protocols, SOPs, and QC reporting
-- Training and documentation for junior staff
+A modular and reproducible framework for developing and optimizing bioinformatics tools and pipelines. Focused on RNA-Seq and single-cell RNA-Seq analysis, cohort studies, and interactive data visualization. Designed for collaboration with laboratory scientists and supports drug discovery initiatives.
 
-## Project Structure
-- `rna_seq/` — Bulk RNA-Seq analysis scripts and pipelines
-- `scrna_seq/` — Single-cell RNA-Seq analysis scripts, demo data, and results (Seurat, R)
-- `visualization/` — Interactive visualization tools (Dash, Shiny)
-- `workflows/` — Workflow management scripts (Snakemake, Nextflow)
-- `docs/` — Protocols, SOPs, and documentation
-## Single-cell RNA-Seq Analysis Pipeline (Seurat)
+## ✨ Features
 
-This pipeline demonstrates end-to-end single-cell RNA-Seq analysis using the Seurat R package, including:
-- Data loading (10x Genomics format, with demo data provided)
-- Quality control and filtering (tuned for synthetic data)
-- Normalization and feature selection
-- Dimensionality reduction (PCA, UMAP)
-- Clustering (with adjustable resolution)
-- Marker gene identification
-- Visualization (UMAP, feature plots)
+*   **Bulk RNA-Seq Analysis:** Automated pipeline from counts to annotated results using DESeq2.
+*   **Single-cell RNA-Seq Analysis:** End-to-end analysis with Seurat (R), including demo data.
+*   **Interactive Visualization:** Dash (Python) and Shiny (R) apps for data exploration.
+*   **Reproducible Workflows:** Managed with Snakemake and Nextflow.
+*   **Documentation & Training:** Comprehensive protocols, SOPs, and materials for team collaboration.
+*   **QC & Reporting:** Integrated quality control and reporting at every step.
 
-### How to Run the Demo
-1. Activate your R environment with Seurat and tidyverse installed.
-2. From the project root, run:
-   ```bash
-   cd scrna_seq
-   Rscript scrna_seq_analysis.R
-   ```
-3. Results (plots, marker genes, Seurat object) will be saved in `scrna_seq/results/`.
+## 📁 Project Structure
 
-### Demo Data
-- Demo 10x-style dataset (500 genes × 50 cells, realistic sparse counts) is included in `scrna_seq/data/demo_10x/`.
-- The pipeline is tuned to work with this synthetic data, but can be adapted for real datasets.
-
-
-## Getting Started
-1. Clone the repository and set up your Python and R environments.
-2. Explore the `rna_seq/` and `single_cell/` folders for analysis scripts.
-3. Use the `workflows/` folder for reproducible pipeline execution.
-4. See `docs/` for protocols and training materials.
-
-## Collaboration
-Contributions are welcome! Please open issues or submit pull requests for new features, bug fixes, or documentation improvements.
-
-## License
-MIT License.
-
-## Bulk RNA-Seq Analysis Pipeline (Step-by-Step)
-
-This pipeline automates bulk RNA-Seq analysis from raw count matrix to annotated results and visualization. It is managed by Snakemake for reproducibility and modularity.
-
-### Steps:
-
-1. **Preprocessing & QC** (`preprocess_qc.py`)
-   - Input: Raw count matrix (`sample_counts.csv`)
-   - Performs quality control, summary statistics, and generates a library size plot.
-   - Outputs: Cleaned count matrix (`counts_for_deseq2.csv`), QC plot (`library_sizes.png`).
-
-2. **Differential Expression Analysis** (`deseq2_analysis.R`)
-   - Input: Cleaned count matrix
-   - Runs DESeq2 in R to identify differentially expressed genes between conditions.
-   - Outputs: DESeq2 results (`deseq2_results.csv`), MA plot (`deseq2_MAplot.png`).
-
-3. **Annotation** (`annotate_results.py`)
-   - Input: DESeq2 results and gene annotation file (`gene_annotation.csv`)
-   - Merges gene-level results with gene symbols/descriptions for interpretability.
-   - Output: Annotated results (`annotated_results.csv`).
-
-4. **Visualization** (`volcano_plot.py`)
-   - Input: Annotated results
-   - Generates a volcano plot to visualize significant genes.
-   - Output: Volcano plot image (`volcano_plot.png`).
-
-
-### How to Run
-
-1. Activate the virtual environment:
-   ```bash
-   source .venv/bin/activate
-   ```
-2. Run the pipeline from the project root directory:
-   ```bash
-   snakemake --snakefile workflows/Snakefile --cores 1 --printshellcmds
-   ```
-3. All outputs will be generated in the `rna_seq/` directory.
-
-### File Overview
-- `rna_seq/sample_counts.csv`: Example input count matrix
-- `rna_seq/gene_annotation.csv`: Example gene annotation file
-- `rna_seq/preprocess_qc.py`: Python script for QC and preprocessing
-- `rna_seq/deseq2_analysis.R`: R script for DESeq2 analysis
-- `rna_seq/annotate_results.py`: Python script for annotation
-- `rna_seq/volcano_plot.py`: Python script for volcano plot
-- `workflows/Snakefile`: Snakemake workflow definition
-
-### Customization
-- Edit `config.yaml` to change input files or parameters.
-- Replace example data with your own for real analyses.
-
-For questions or troubleshooting, see the comments in each script or open an issue.
-
-## Data Processing & Analysis Pipeline (Mermaid Diagram)
-
-```mermaid
-graph TD
-A[Raw Count Matrix: sample_counts.csv] --> B[Preprocessing & QC: preprocess_qc.py]
-B --> C[Cleaned Counts: counts_for_deseq2.csv]
-C --> D[Differential Expression: deseq2_analysis.R]
-D --> E[DESeq2 Results: deseq2_results.csv]
-E --> F[Annotation: annotate_results.py]
-F --> G[Annotated Results: annotated_results.csv]
-G --> H[Visualization: volcano_plot.py]
-H --> I[Volcano Plot: volcano_plot.png]
-E --> J[MA Plot: deseq2_MAplot.png]
-B --> K[QC Plot: library_sizes.png]
+```
+bioinformatics-pipeline/
+├── rna_seq/                 # Bulk RNA-Seq analysis (DESeq2)
+├── scrna_seq/               # Single-cell RNA-Seq analysis (Seurat)
+│   ├── data/                # Input data (includes demo dataset)
+│   ├── scrna_seq_analysis.R # Main analysis script
+│   └── results/             # Output directory for plots & results
+├── visualization/           # Interactive apps (Dash, Shiny)
+├── workflows/               # Pipeline definitions (Snakemake, Nextflow)
+└── docs/                    # Protocols, SOPs, and documentation
 ```
 
-This diagram summarizes the flow of data and analysis steps in the bulk RNA-Seq pipeline.
+## 🚀 Quick Start
 
-## Future Expansion
+### Bulk RNA-Seq Pipeline (Snakemake)
 
-This repository is designed for extensibility. Planned and possible future enhancements include:
+1.  **Set up the environment:**
+    ```bash
+    source .venv/bin/activate  # Activate your virtual environment
+    ```
 
-- **Multi-omics Integration:** Add support for proteomics, metabolomics, or other omics data types.
-- **Advanced Visualization:** Expand interactive dashboards (Dash, Shiny) for deeper data exploration.
-- **Cloud & HPC Support:** Enable execution on cloud platforms or high-performance computing clusters.
-- **Parameter Sweeps & Batch Analysis:** Automate large-scale analyses with parameter sweeps and batch processing.
-- **Automated Reporting:** Generate comprehensive HTML or PDF reports summarizing results and QC.
-- **User-friendly Interfaces:** Add GUIs or web interfaces for non-technical users.
+2.  **Run the entire pipeline:**
+    ```bash
+    snakemake --snakefile workflows/Snakefile --cores 1 --printshellcmds
+    ```
+    *Outputs will be generated in the `rna_seq/` directory.*
 
-Contributions and suggestions for new features are welcome!
+### Single-cell RNA-Seq Demo (Seurat)
 
-## Integration Plan: Bulk and Single-cell RNA-Seq Analysis
-
-Integrating bulk and single-cell RNA-Seq analyses provides a comprehensive view of gene expression, enabling both population-level and cell-type-specific insights. Here’s a practical integration plan you can present or implement:
-
-### 1. Independent Analysis
-- Run bulk RNA-Seq and single-cell RNA-Seq pipelines separately to obtain:
-  - Differentially expressed (DE) genes from bulk (e.g., DESeq2 results)
-  - Cluster-specific marker genes from single-cell (e.g., Seurat markers)
-
-### 2. Comparative Analysis
-- Compare DE genes from bulk with marker genes from single-cell clusters:
-  - Identify which cell types or clusters drive the bulk expression changes.
-  - Use Venn diagrams or heatmaps to visualize overlap.
-
-### 3. Deconvolution
-- Use single-cell data to deconvolute bulk RNA-Seq samples:
-  - Estimate cell type proportions in bulk samples using single-cell reference profiles (e.g., CIBERSORTx, MuSiC).
-
-### 4. Cross-validation
-- Validate findings from one platform with the other:
-  - Confirm bulk DE genes are expressed in relevant single-cell clusters.
-  - Use single-cell data to interpret ambiguous bulk results.
-
-### 5. Multi-omics Integration (Optional)
-- Integrate with other omics data (e.g., proteomics, ATAC-seq) for deeper insights.
-
-### 6. Reporting & Visualization
-- Summarize integrated findings in joint plots, tables, and reports.
-- Highlight how single-cell data refines or explains bulk results.
+1.  **Navigate to the scRNA-seq directory and run the analysis:**
+    ```bash
+    cd scrna_seq
+    Rscript scrna_seq_analysis.R
+    ```
+    *Results (plots, markers, Seurat object) will be saved in `scrna_seq/results/`.*
 
 ---
 
-**Tip for Demonstration:**
-- Show how your modular pipeline structure supports integration (e.g., by exporting results to common formats).
-- Discuss how you would automate or script the comparative and deconvolution steps for real projects.
-- Mention tools/packages you would use (e.g., Seurat, DESeq2, CIBERSORTx, custom R/Python scripts).
+## 🔬 Pipeline Details
 
-This plan demonstrates both technical skill and strategic thinking for modern bioinformatics projects.
+### 1. Bulk RNA-Seq Analysis
 
-## Methods Overview
+A Snakemake-managed pipeline for differential expression analysis.
 
-### Bulk RNA-Seq (DESeq2)
-- **Normalization:** Adjusts for sequencing depth and RNA composition using size factors.
-- **Statistical Model:** Models gene counts with a negative binomial distribution to account for biological and technical variability.
-- **Differential Expression:** Uses hypothesis testing (Wald test or likelihood ratio test) to identify genes with significant expression changes between conditions.
-- **Multiple Testing Correction:** Adjusts p-values (e.g., Benjamini-Hochberg) to control the false discovery rate.
-- **Visualization:** Volcano and MA plots display the magnitude and significance of gene expression changes.
+**Workflow Overview:**
+```mermaid
+graph LR
+A[Raw Counts] --> B[Preprocessing & QC];
+B --> C[DESeq2 Analysis];
+C --> D[Results Annotation];
+C --> E[MA Plot];
+D --> F[Volcano Plot];
+```
 
-### Single-cell RNA-Seq (Seurat)
-- **Quality Control:** Filters cells based on gene/cell counts and mitochondrial content to remove low-quality cells.
-- **Normalization:** Log-normalizes counts to account for sequencing depth per cell.
-- **Feature Selection:** Identifies highly variable genes for downstream analysis.
-- **Dimensionality Reduction:** Uses PCA to reduce noise and UMAP/tSNE for visualization.
-- **Clustering:** Constructs a nearest-neighbor graph and applies the Louvain or Leiden algorithm to find cell clusters.
-- **Marker Gene Detection:** Finds genes specifically expressed in each cluster using statistical tests (e.g., Wilcoxon rank-sum).
+**Steps:**
+1.  **Preprocessing & QC** (`preprocess_qc.py`): Loads `sample_counts.csv`, performs QC, and outputs a cleaned matrix and library size plot.
+2.  **Differential Expression** (`deseq2_analysis.R`): Runs DESeq2 to identify DEGs. Outputs results and an MA plot.
+3.  **Annotation** (`annotate_results.py`): Merges results with `gene_annotation.csv` for biological context.
+4.  **Visualization** (`volcano_plot.py`): Generates a volcano plot from the annotated results.
 
-### Integration
-- **Comparative Analysis:** Compares DE genes from bulk with marker genes from single-cell clusters to link population-level changes to specific cell types.
-- **Deconvolution:** Uses single-cell profiles to estimate cell type proportions in bulk samples (tools: CIBERSORTx, MuSiC).
-- **Cross-validation:** Confirms findings across data types for robust biological interpretation.
+### 2. Single-Cell RNA-Seq Analysis
+
+A Seurat-based pipeline for analyzing scRNA-seq data.
+
+**Steps include:**
+*   Data loading (10x Genomics format supported)
+*   Quality control and filtering
+*   Normalization and feature selection
+*   Dimensionality reduction (PCA, UMAP)
+*   Clustering and marker gene identification
+*   Visualization (UMAP plots, feature plots)
+
+**Demo Data:** A synthetic 10x-style dataset (500 genes x 50 cells) is provided in `scrna_seq/data/demo_10x/` to test the pipeline.
+
+---
+
+## 🧠 Integration Strategy: Bulk & Single-Cell
+
+A key strength of this framework is the ability to integrate findings across data modalities.
+
+1.  **Independent Analysis:** Run bulk and single-cell pipelines separately to get DEGs and cluster markers.
+2.  **Comparative Analysis:** Overlap DEGs from bulk with marker genes from single-cell to identify which cell types drive population-level changes.
+3.  **Deconvolution:** Use single-cell data as a reference (e.g., with CIBERSORTx) to estimate cell type proportions in bulk samples.
+4.  **Cross-Validation:** Validate bulk findings by confirming DEG expression in specific cell clusters from the single-cell data.
+
+*This integrated approach provides a more complete biological narrative, linking population-level changes to their cellular origins.*
+
+## 🧪 Methods Overview
+
+| Analysis Type | Key Tools | Primary Methods |
+| :--- | :--- | :--- |
+| **Bulk RNA-Seq** | DESeq2, Snakemake | Negative binomial GLM, Wald test, FDR correction |
+| **Single-Cell RNA-Seq** | Seurat | Log-normalization, HVG selection, PCA, graph-based clustering, Wilcoxon rank-sum test |
+| **Workflow Management** | Snakemake, Nextflow | Directed acyclic graph (DAG) execution, dependency resolution, conditional branching, checkpointing, portability across environments |
+
+**Key Workflow Management Features:**
+- **Reproducibility:** Automated, self-documenting pipelines ensure consistent results.
+- **Scalability:** Seamless scaling from local computers to clusters and cloud environments.
+- **Modularity:** Complex workflows are broken into manageable, reusable rules/processes.
+- **Portability:** Containerization support (Docker/Singularity) ensures consistent software environments across different systems.
+
+---
+
+## 🔮 Future Roadmap
+
+This repository is designed for extensibility. Planned enhancements include:
+*   **Multi-omics Integration:** Support for proteomics, metabolomics, and ATAC-seq data.
+*   **Advanced Visualization:** Enhanced interactive dashboards for integrated data exploration.
+*   **Cloud/HPC Support:** Scale analyses on cloud platforms and high-performance clusters.
+*   **Automated Reporting:** Generate comprehensive HTML/PDF reports for sharing insights.
+*   **Parameter Sweeps:** Tools for automated large-scale batch analysis and optimization.
+
+## 🤝 Collaboration
+
+Contributions are welcome! Please feel free to:
+1.  Open an issue for bug reports, feature requests, or questions.
+2.  Submit a pull request for new features, optimizations, or documentation improvements.
+
+## 📄 License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+```
