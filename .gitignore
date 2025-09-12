@@ -1,7 +1,19 @@
-# Byte-compiled / optimized / DLL files
+# Snakemake metadata and logs
+.snakemake/
+*.log
+*.tmp
+
+# Python cache
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
+
+# RStudio and OS X
+.Rhistory
+.RData
+.DS_Store
+
+# Virtual environments
+.venv/
 
 # R data and history files
 *.RData
@@ -27,8 +39,3 @@ __pycache__/
 # Workflow outputs
 results/
 output/
-
-# Environment files
-.venv/
-.env
-.DS_Store
