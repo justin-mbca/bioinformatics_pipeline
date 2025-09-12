@@ -78,4 +78,4 @@ def update_plot(plot_type, gene):
         return {}, {'marginTop': 10, 'display': 'none'}
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)
