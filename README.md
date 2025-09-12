@@ -87,16 +87,16 @@ For questions or troubleshooting, see the comments in each script or open an iss
 
 ```mermaid
 graph TD
-    A[Raw Count Matrix (sample_counts.csv)] --> B[Preprocessing & QC (preprocess_qc.py)]
-    B --> C[Cleaned Counts (counts_for_deseq2.csv)]
-    C --> D[Differential Expression (deseq2_analysis.R)]
-    D --> E[DESeq2 Results (deseq2_results.csv)]
-    E --> F[Annotation (annotate_results.py)]
-    F --> G[Annotated Results (annotated_results.csv)]
-    G --> H[Visualization (volcano_plot.py)]
-    H --> I[Volcano Plot (volcano_plot.png)]
-    E --> J[MA Plot (deseq2_MAplot.png)]
-    B --> K[QC Plot (library_sizes.png)]
+A[Raw Count Matrix (sample_counts.csv)] --> B[Preprocessing & QC (preprocess_qc.py)]
+B --> C[Cleaned Counts (counts_for_deseq2.csv)]
+C --> D[Differential Expression (deseq2_analysis.R)]
+D --> E[DESeq2 Results (deseq2_results.csv)]
+E --> F[Annotation (annotate_results.py)]
+F --> G[Annotated Results (annotated_results.csv)]
+G --> H[Visualization (volcano_plot.py)]
+H --> I[Volcano Plot (volcano_plot.png)]
+E --> J[MA Plot (deseq2_MAplot.png)]
+B --> K[QC Plot (library_sizes.png)]
 ```
 
 This diagram summarizes the flow of data and analysis steps in the bulk RNA-Seq pipeline.
