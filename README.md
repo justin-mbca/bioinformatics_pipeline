@@ -55,16 +55,16 @@ This pipeline automates bulk RNA-Seq analysis from raw count matrix to annotated
    - Generates a volcano plot to visualize significant genes.
    - Output: Volcano plot image (`volcano_plot.png`).
 
+
 ### How to Run
 
 1. Activate the virtual environment:
    ```bash
    source .venv/bin/activate
    ```
-2. Run the pipeline from the `workflows/` directory:
+2. Run the pipeline from the project root directory:
    ```bash
-   cd workflows
-   snakemake --cores 1 --printshellcmds
+   snakemake --snakefile workflows/Snakefile --cores 1 --printshellcmds
    ```
 3. All outputs will be generated in the `rna_seq/` directory.
 
