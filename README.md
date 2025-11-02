@@ -101,8 +101,9 @@ A key strength of this framework is the ability to integrate findings across dat
 2.  **Comparative Analysis:** Overlap DEGs from bulk with marker genes from single-cell to identify which cell types drive population-level changes.
 3.  **Deconvolution:** Use single-cell data as a reference (e.g., with CIBERSORTx) to estimate cell type proportions in bulk samples.
 4.  **Cross-Validation:** Validate bulk findings by confirming DEG expression in specific cell clusters from the single-cell data.
-
 *This integrated approach provides a more complete biological narrative, linking population-level changes to their cellular origins.*
+
+This project produces integrated clinical and bioinformatics reports designed to surface actionable insights for downstream validation and decision-making.
 
 ## 🧪 Methods Overview
 
