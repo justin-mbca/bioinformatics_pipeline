@@ -1,0 +1,2 @@
+# Local config for workflows_local/Snakefile
+gene_annotation: "data/gene_annotation.csv"

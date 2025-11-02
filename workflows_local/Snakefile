@@ -1,0 +1,64 @@
+# Local copy: Extended Snakemake workflow for RNA-Seq + clinical integration
+
+configfile: "workflows_local/config.yaml"
+
+rule all:
+    input:
+        "rna_seq/annotated_results.csv",
+        "rna_seq/volcano_plot.png",
+        "clinical/analysis_results.csv",
+        "integration/combined_biomarker_report.csv"
+
+rule preprocess_qc:
+    input:
+        counts="rna_seq/sample_counts.csv"
+    output:
+        cleaned="rna_seq/counts_for_deseq2.csv",
+        plot="rna_seq/library_sizes.png"
+    script:
+        "../rna_seq/preprocess_qc.py"
+
+rule deseq2:
+    input:
+        counts="rna_seq/counts_for_deseq2.csv"
+    output:
+        results="rna_seq/deseq2_results.csv",
+        maplot="rna_seq/deseq2_MAplot.png"
+    script:
+        "../rna_seq/deseq2_analysis.R"
+
+rule annotate:
+    input:
+        results="rna_seq/deseq2_results.csv",
+        annotation=config["gene_annotation"]
+    output:
+        annotated="rna_seq/annotated_results.csv"
+    script:
+        "../rna_seq/annotate_results.py"
+
+rule volcano_plot:
+    input:
+        annotated="rna_seq/annotated_results.csv"
+    output:
+        plot="rna_seq/volcano_plot.png"
+    script:
+        "../rna_seq/volcano_plot.py"
+
+# Clinical data processing and integration (adds clinical analysis and integration outputs)
+rule clinical_process:
+    input:
+        raw_clinical="clinical/raw_clinical.csv"
+    output:
+        cleaned="clinical/cleaned_clinical.csv",
+        analysis="clinical/analysis_results.csv"
+    run:
+        shell("python workflows_local/clinical_pipeline.py {input.raw_clinical} {output.cleaned} {output.analysis}")
+
+rule integrate_genomics_clinical:
+    input:
+        genes="rna_seq/annotated_results.csv",
+        clinical="clinical/analysis_results.csv"
+    output:
+        report="integration/combined_biomarker_report.csv"
+    run:
+        shell("python workflows_local/integrate_genomics_clinical.py {input.genes} {input.clinical} {output.report}")
