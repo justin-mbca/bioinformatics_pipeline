@@ -248,6 +248,31 @@ This project includes interactive dashboards for exploring both bulk and single-
 
 Feel free to extend these apps for additional visualizations or data types.
 
+## Examples: from data → insight → action
+
+Concrete examples showing how raw data are converted to insight and then to action. Each example is short and structured: Data → Insight → Action.
+
+1) Bulk RNA-Seq — biomarker discovery
+- Data: raw counts matrix (samples × genes) from a case/control RNA-Seq study.
+- Insight: `DESeq2` identifies `GeneX` with log2FC = 2.3 and padj = 0.003; annotation links `GeneX` to a druggable pathway.
+- Action: add `GeneX` to a targeted qPCR validation panel and prioritize for follow-up functional assays.
+
+2) Single-cell analysis — cell-type driver of a population signal
+- Data: 10x scRNA-seq from biopsies; Seurat clustering yields cluster markers (e.g., `GeneY` in cluster 2).
+- Insight: `GeneY` is enriched in cluster 2, which is over-represented in non-responders; bulk DE shows `GeneY` upregulated in the same group.
+- Action: derive a cluster-2 signature for targeted assays and perform spatial validation (IHC/RNA-ISH) to confirm cell-type localization.
+
+3) Integrated clinical-genomics — patient stratification
+- Data: clinical outcomes and genomics (bulk RNA-seq) across a phase II cohort.
+- Insight: high expression of `GeneZ` (top quartile) correlates with improved PFS (Cox p=0.02).
+- Action: propose `GeneZ` as a stratification biomarker for the next study; prepare analytical validation and CLIA transfer of the assay.
+
+4) Safety triage — AE correlation with expression
+- Data: adverse event reports plus transcriptomics from treated patients.
+- Insight: elevated `GeneA` expression correlates with Grade 3 transaminitis and maps to hepatocyte markers in scRNA data.
+- Action: add `GeneA` monitoring to safety labs and flag for priority mechanistic studies; consider protocol amendment for monitoring criteria.
+
+
 ## 🤝 Collaboration
 
 Contributions are welcome! Please feel free to:

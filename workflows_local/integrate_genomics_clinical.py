@@ -3,6 +3,7 @@
 Usage: integrate_genomics_clinical.py genes.csv clinical_summary.csv combined_report.csv
 """
 import sys
+import os
 import pandas as pd
 from difflib import SequenceMatcher
 
@@ -16,6 +17,7 @@ def main():
     parser.add_argument('out', help='output combined report CSV')
     parser.add_argument('--markers', help='optional markers CSV (scRNA markers)')
     parser.add_argument('--mapping', help='optional mapping CSV with columns source_id,canonical_symbol')
+    parser.add_argument('--prioritize', action='store_true', help='produce prioritized_candidates.csv from the combined report')
     args = parser.parse_args()
 
     genes = pd.read_csv(args.genes)
@@ -103,11 +105,12 @@ def main():
                 notes.append('high priority')
             else:
                 notes.append(pd.NA)
-        report['note'] = notes
+            report['note'] = notes
     except Exception:
         report['note'] = pd.NA
 
     report.to_csv(out, index=False)
+
     print(f"Wrote integrated report to {out}")
 
     # If markers provided, append marker info (cluster, avg_log2FC) when gene names match
@@ -151,6 +154,7 @@ def main():
             sym_series = report['canonical'].astype(str).fillna('').str.lower()
             gid_series = report['gene_id'].astype(str).fillna('').str.lower()
 
+            matched_marker_ids = set()
             for i, row in marker_info.iterrows():
                 gm_raw = row['gene_match']
                 # if mapping provided, map marker gene to canonical before matching
@@ -202,8 +206,53 @@ def main():
                         report.at[j, 'marker_cluster'] = row.get(cluster_col, pd.NA)
                     if score_col:
                         report.at[j, 'marker_avg_log2FC'] = row.get(score_col, pd.NA)
+                # record whether this marker was matched at least once
+                try:
+                    if len(idx) > 0:
+                        matched_marker_ids.add(str(gm_raw))
+                except Exception:
+                    pass
             report.to_csv(out, index=False)
+
+            # summary: matched / unmatched markers
+            total_markers = len(marker_info)
+            matched_count = len(matched_marker_ids)
+            unmatched_mask = ~marker_info['gene_match'].astype(str).isin(matched_marker_ids)
+            unmatched = marker_info.loc[unmatched_mask].copy()
+            # write unmapped markers artifact next to output
+            unmapped_path = os.path.splitext(out)[0] + '.unmapped_markers.csv'
+            try:
+                unmatched.to_csv(unmapped_path, index=False)
+            except Exception:
+                unmapped_path = None
+
             print(f"Appended marker info from {markers_path} and updated {out}")
+            print(f"Marker summary: total={total_markers}, matched={matched_count}, unmatched={len(unmatched)}")
+            if unmapped_path:
+                print(f"Wrote unmapped markers to: {unmapped_path}")
+            # optional prioritization
+            if args.prioritize:
+                try:
+                    import numpy as np
+                    r = report.copy()
+                    r['padj_num'] = pd.to_numeric(r.get('padj'), errors='coerce')
+                    r['l2fc_num'] = pd.to_numeric(r.get('log2FoldChange'), errors='coerce').fillna(0)
+                    r['marker_avg'] = pd.to_numeric(r.get('marker_avg_log2FC'), errors='coerce').fillna(0)
+                    def score_row(row):
+                        s = 0.0
+                        padj = row['padj_num']
+                        if pd.notna(padj) and padj > 0:
+                            s += 2 * (-np.log10(padj))
+                        s += abs(row['l2fc_num'])
+                        s += 0.5 * abs(row['marker_avg'])
+                        return s
+                    r['score'] = r.apply(score_row, axis=1)
+                    outp = os.path.splitext(out)[0] + '.prioritized_candidates.csv'
+                    r.sort_values('score', ascending=False).to_csv(outp, index=False)
+                    print(f'Wrote prioritized candidates to: {outp}')
+                    print(r.sort_values('score', ascending=False)[['gene_id','symbol','score']].head(10).to_string())
+                except Exception as e:
+                    print(f'Failed to produce prioritized candidates: {e}')
         except Exception as e:
             print(f"Failed to append markers: {e}")
 
