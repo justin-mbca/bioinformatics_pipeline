@@ -14,24 +14,45 @@ def main():
     # Preferred columns: gene_id, symbol, log2FoldChange, padj, clinical_association, cohort_frequency, note
     report = pd.DataFrame()
 
-    # gene_id
-    if 'gene_id' in genes.columns:
-        report['gene_id'] = genes['gene_id']
-    elif 'Unnamed: 0' in genes.columns:
-        report['gene_id'] = genes['Unnamed: 0']
-    elif 'annotation' in genes.columns:
-        report['gene_id'] = genes['annotation']
-    else:
-        # fallback to first column
-        report['gene_id'] = genes.iloc[:, 0]
+    # gene_id - prefer human-readable name columns before numeric index-like columns
+    gene_id_col = None
+    for candidate in ['gene', 'Unnamed: 0', 'annotation', 'symbol', 'gene_id']:
+        if candidate in genes.columns:
+            gene_id_col = candidate
+            break
+    if gene_id_col is None:
+        # pick the first non-numeric column if possible
+        for c in genes.columns:
+            if genes[c].dtype == object:
+                gene_id_col = c
+                break
+    if gene_id_col is None:
+        gene_id_col = genes.columns[0]
 
-    # symbol
+    report['gene_id'] = genes[gene_id_col].astype(str)
+
+    # symbol - try genes, then annotation, then external mapping file
     if 'symbol' in genes.columns:
         report['symbol'] = genes['symbol']
     elif 'annotation' in genes.columns:
         report['symbol'] = genes['annotation']
     else:
-        report['symbol'] = report['gene_id']
+        # attempt to look up gene symbol from local annotation file
+        try:
+            ann = pd.read_csv('workflows_local/gene_annotation.csv')
+            # map columns 'gene' or 'gene_id' -> symbol/annotation
+            key_col = None
+            if 'gene' in ann.columns:
+                key_col = 'gene'
+            elif 'gene_id' in ann.columns:
+                key_col = 'gene_id'
+            if key_col:
+                mapping = dict(zip(ann[key_col].astype(str), ann.get('annotation', ann.get('symbol', ann[key_col])).astype(str)))
+                report['symbol'] = report['gene_id'].map(mapping).fillna(report['gene_id'])
+            else:
+                report['symbol'] = report['gene_id']
+        except Exception:
+            report['symbol'] = report['gene_id']
 
     # effect size and p-values
     report['log2FoldChange'] = genes.get('log2FoldChange', pd.NA)
