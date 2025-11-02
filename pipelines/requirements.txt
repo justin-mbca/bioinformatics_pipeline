@@ -1,0 +1,7 @@
+pandas
+numpy
+prefect
+pytest
+scikit-learn
+snakemake
+pydantic

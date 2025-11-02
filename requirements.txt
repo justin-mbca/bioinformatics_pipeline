@@ -3,6 +3,12 @@ matplotlib
 numpy
 snakemake
 
+# Optional clinical/orchestration deps
+# pydantic for schema validation, prefect for orchestration
+# These are optional and can be installed in the clinical environment
+# pip install pydantic prefect
+
 dash
 plotly
 scikit-learn
+scvi-tools
