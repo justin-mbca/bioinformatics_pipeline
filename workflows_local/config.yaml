@@ -1,2 +1,5 @@
 # Local config for workflows_local/Snakefile
-gene_annotation: "data/gene_annotation.csv"
+gene_annotation: "workflows_local/gene_annotation.csv"
+# Optional: explicit merge key to use when annotating DE results. If unset, the annotate
+# script will try sensible heuristics ('gene_id','gene', index, etc.).
+gene_annotation_key: "gene_id"
