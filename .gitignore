@@ -39,3 +39,9 @@ __pycache__/
 # Workflow outputs
 results/
 output/
+
+# Allow committing the example scRNA-seq results folder used for demos/portfolio
+# This repo generally ignores common data and binary files, but we explicitly
+# permit `scrna_seq/results/` (and its contents) to be added when needed.
+!scrna_seq/results/
+!scrna_seq/results/**
