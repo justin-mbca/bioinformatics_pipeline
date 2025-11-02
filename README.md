@@ -130,6 +130,25 @@ This repository is designed for extensibility. Planned enhancements include:
 *   **Parameter Sweeps:** Tools for automated large-scale batch analysis and optimization.
 
 
+## 🧪 Development & CI
+
+This repository includes automated tests and CI workflows to keep the pipeline stable:
+
+- `CHANGELOG.md` - a running changelog for unreleased and released changes.
+- GitHub Actions workflows:
+    - `.github/workflows/ci.yml` - lightweight CI that installs Python deps, runs `pytest`, and performs a Snakemake dry-run (`-n`).
+    - `.github/workflows/ci-full.yml` - (optional) runs Snakemake inside an R-enabled Docker image and installs DESeq2 to validate R dependencies (dry-run).
+
+Run tests locally before pushing changes:
+
+```bash
+source .venv/bin/activate
+pytest -q
+```
+
+If you want CI to run the full pipeline and produce artifacts, update the CI workflow to store outputs as artifacts or use a dedicated runner with sufficient resources.
+
+
 ## 📊 Interactive Visualization
 
 This project includes interactive dashboards for exploring both bulk and single-cell RNA-Seq data.
