@@ -36,6 +36,10 @@ __pycache__/
 *.tmp
 *.bak
 
+# Allow checked-in example reports and docs
+!docs/report_example.csv
+!docs/report_example.md
+
 # Workflow outputs
 results/
 output/
