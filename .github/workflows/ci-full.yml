@@ -1,0 +1,22 @@
+name: CI-Full
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  full-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Snakemake with R (Docker)
+        run: |
+          docker pull rocker/verse:4.2.2
+          docker run --rm -v ${{ github.workspace }}:/work -w /work rocker/verse:4.2.2 bash -lc "\
+            apt-get update && apt-get install -y python3 python3-pip git && \
+            python3 -m pip install --upgrade pip && \
+            pip3 install snakemake pandas && \
+            Rscript -e 'if (!requireNamespace("BiocManager", quietly=TRUE)) install.packages("BiocManager", repos="https://cloud.r-project.org"); BiocManager::install("DESeq2", ask=FALSE)' && \
+            snakemake --snakefile workflows_local/Snakefile -n"
