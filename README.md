@@ -122,6 +122,8 @@ This structure is intentionally lightweight and can be extended per-study to inc
 
 Download the small example integrated report (CSV): [docs/report_example.csv](docs/report_example.csv)
 
+![Example report chart](docs/report_example.png)
+
 ## 🧪 Methods Overview
 
 | Analysis Type | Key Tools | Primary Methods |
