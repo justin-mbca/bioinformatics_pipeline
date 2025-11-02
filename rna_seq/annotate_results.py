@@ -56,6 +56,9 @@ def annotate(de_file, ann_file, out_file, merge_key=None):
     # If explicit merge_key provided, prefer it (if present)
     if merge_key:
         if merge_key in de_df.columns and merge_key in ann_df.columns:
+            # coerce merge columns to string to avoid object/int mismatches
+            de_df[merge_key] = de_df[merge_key].astype(str)
+            ann_df[merge_key] = ann_df[merge_key].astype(str)
             merged = pd.merge(de_df, ann_df, on=merge_key, how='left')
         else:
             # fallback to heuristics if explicit key isn't present in both

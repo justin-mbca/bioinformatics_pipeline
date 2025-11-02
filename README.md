@@ -105,6 +105,29 @@ A key strength of this framework is the ability to integrate findings across dat
 
 This project produces integrated clinical and bioinformatics reports designed to surface actionable insights for downstream validation and decision-making.
 
+Mapping CSV format (optional)
+-----------------------------
+
+To reliably join scRNA marker genes and bulk-DE gene identifiers you can provide a small mapping CSV that normalizes identifiers to a canonical symbol. The integrator script supports an optional `--mapping` CSV with the following columns:
+
+- `source_id` — identifier used in the markers file (e.g., raw gene name from Seurat `markers.csv`).
+- `canonical_symbol` — canonical gene symbol used in the report (e.g., HGNC symbol or the ID used in your DE table).
+
+Example `workflows_local/gene_mapping_example.csv`:
+
+source_id,canonical_symbol
+Gene145,GeneA
+Gene383,GeneB
+
+Usage example (integrator):
+
+```bash
+python workflows_local/integrate_genomics_clinical.py rna_seq/annotated_results.csv clinical/analysis_results.csv docs/report_example.csv \
+    --markers scrna_seq/results/markers.csv --mapping workflows_local/gene_mapping_example.csv
+```
+
+If the mapping file is missing or invalid the script will warn and fall back to matching by symbol/gene_id with conservative fuzzy matching.
+
 Example actionable report fields
 --------------------------------
 
