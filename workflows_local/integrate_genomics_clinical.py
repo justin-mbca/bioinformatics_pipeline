@@ -77,8 +77,22 @@ def main():
     else:
         report['cohort_frequency'] = pd.NA
 
-    # note column for actionable recommendation (left blank for now)
+    # note column for actionable recommendation (heuristics)
     report['note'] = pd.NA
+    try:
+        padj_vals = pd.to_numeric(report.get('padj', pd.Series([pd.NA]*len(report))), errors='coerce')
+        l2fc_vals = pd.to_numeric(report.get('log2FoldChange', pd.Series([pd.NA]*len(report))), errors='coerce')
+        notes = []
+        for p, l in zip(padj_vals, l2fc_vals):
+            if pd.notna(p) and p < 0.05:
+                notes.append('validate by qPCR')
+            elif pd.notna(l) and abs(l) > 1.0:
+                notes.append('high priority')
+            else:
+                notes.append(pd.NA)
+        report['note'] = notes
+    except Exception:
+        report['note'] = pd.NA
 
     report.to_csv(out, index=False)
     print(f"Wrote integrated report to {out}")
