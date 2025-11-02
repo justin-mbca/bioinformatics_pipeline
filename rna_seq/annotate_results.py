@@ -21,7 +21,13 @@ def annotate(de_file, ann_file, out_file, merge_key=None):
         merge_key: optional explicit column name to merge on; if None, heuristics are used
     """
 
-    de_df = pd.read_csv(de_file, index_col=0)
+    # If an explicit merge_key is requested, read DE file without forcing the first
+    # column to be the index so the key remains available as a column. Otherwise
+    # read using the common pattern where gene IDs are in the index.
+    if merge_key:
+        de_df = pd.read_csv(de_file, index_col=None)
+    else:
+        de_df = pd.read_csv(de_file, index_col=0)
     ann_df = pd.read_csv(ann_file)
 
     # Normalize candidate key names and find a common merge key

@@ -44,3 +44,23 @@ def test_annotate_with_gene_header(tmp_path):
     out = pd.read_csv(out_fp)
     # ensure symbol column present
     assert 'symbol' in out.columns
+
+
+def test_annotate_with_explicit_merge_key(tmp_path):
+    # create DE results and annotation that use 'entrez' as the common key
+    de = pd.DataFrame({'entrez': ['E1', 'E2'], 'log2FoldChange': [0.5, -1.1], 'padj': [0.05, 0.2]})
+    ann = pd.DataFrame({'entrez': ['E1', 'E2'], 'symbol': ['One', 'Two']})
+
+    de_fp = tmp_path / 'de3.csv'
+    ann_fp = tmp_path / 'ann3.csv'
+    out_fp = tmp_path / 'out3.csv'
+
+    de.to_csv(de_fp, index=False)
+    ann.to_csv(ann_fp, index=False)
+
+    # call annotate with explicit merge key
+    annotate(str(de_fp), str(ann_fp), str(out_fp), merge_key='entrez')
+
+    out = pd.read_csv(out_fp)
+    assert 'symbol' in out.columns
+    assert 'E1' in out['entrez'].values
