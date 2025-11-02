@@ -1,0 +1,6 @@
+gene_id,symbol,log2FoldChange,padj,clinical_association,cohort_frequency,note
+GeneA,GeneA,-0.0220427040188698,0.99358283467897,AGE,0.02,validate by qPCR
+GeneB,GeneB,-0.0878412578417692,0.99358283467897,AGE,0.01,low priority
+GeneC,GeneC,0.0943865775251181,0.99358283467897,AGE,0.03,validate by qPCR
+GeneD,GeneD,0.0189543085559689,0.99358283467897,AGE,0.00,not significant
+GeneE,GeneE,-0.0441873961441722,0.99358283467897,AGE,0.05,review in larger cohort
