@@ -1,0 +1,7 @@
+# Example config for oncology NGS pipelines
+samples:
+  - sample1
+  - sample2
+reference:
+  fasta: data/example/ref.fa
+  gtf: data/example/genes.gtf

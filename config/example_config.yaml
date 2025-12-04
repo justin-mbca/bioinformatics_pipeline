@@ -1,0 +1,24 @@
+# Example config for all pipelines
+
+# RNA-seq pipeline
+SAMPLES: ["sample1", "sample2"]
+
+# Variant calling pipeline
+VARIANT_SAMPLES: ["sample1", "sample2"]
+REFERENCE_FASTA: "data/example/ref.fa"
+
+# Barcode pipeline
+BARCODE_SAMPLES: ["sample1"]
+
+# Multi-omics integration
+INTEGRATION_INPUTS:
+  rna: "results/rnaseq/deseq2_results.csv"
+  variants: "results/variants/filtered_variants.csv"
+
+# Paths for tools (edit as needed)
+FASTQC: "fastqc"
+MULTIQC: "multiqc"
+BWA: "bwa"
+GATK: "gatk"
+
+# Add more config as needed for your environment

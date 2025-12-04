@@ -1,0 +1,16 @@
+# Snakemake template for RNA-Seq quantification and DE analysis
+
+rule all:
+    input:
+        'results/counts.tsv',
+        'results/deseq2_results.csv'
+
+rule fastqc:
+    input:
+        'data/{sample}.fastq.gz'
+    output:
+        'qc/{sample}_fastqc.html'
+    shell:
+        'fastqc {input} -o qc'
+
+# Add rules: trim, align, count, DESeq2
