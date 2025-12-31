@@ -1,43 +1,21 @@
 {
-  "Name": "rnaseq-etl-pipeline",
-  "Description": "ETL pipeline for processing RNA-Seq count data from Glue catalog to S3",
-  "Role": "arn:aws:iam::<ACCOUNT_ID>:role/GlueETLRole",
-  "ExecutionProperty": {
-    "MaxConcurrentRuns": 3
-  },
+  "Name": "bioinformatics-etl-job",
+  "Role": "arn:aws:iam::ACCOUNT_ID:role/GlueServiceRole",
   "Command": {
     "Name": "glueetl",
-    "ScriptLocation": "s3://<BUCKET_NAME>/glue-scripts/etl_rnaseq_to_s3.py",
+    "ScriptLocation": "s3://bioinformatics-scripts/glue_jobs/rnaseq_etl.py",
     "PythonVersion": "3"
   },
   "DefaultArguments": {
-    "--job-language": "python",
+    "--TempDir": "s3://bioinformatics-temp/",
     "--job-bookmark-option": "job-bookmark-enable",
     "--enable-metrics": "true",
-    "--enable-continuous-cloudwatch-log": "true",
     "--enable-spark-ui": "true",
-    "--spark-event-logs-path": "s3://<BUCKET_NAME>/glue-logs/spark-ui/",
-    "--TempDir": "s3://<BUCKET_NAME>/glue-temp/",
-    "--database_name": "rnaseq_db",
-    "--table_name": "raw_counts",
-    "--output_path": "s3://<BUCKET_NAME>/processed/normalized/",
-    "--count_threshold": "10",
-    "--additional-python-modules": "boto3>=1.26.0"
+    "--spark-event-logs-path": "s3://bioinformatics-logs/spark-logs/"
   },
   "MaxRetries": 1,
-  "Timeout": 2880,
-  "MaxCapacity": 10,
+  "Timeout": 120,
   "GlueVersion": "4.0",
-  "WorkerType": "G.1X",
-  "NumberOfWorkers": 5,
-  "Tags": {
-    "Environment": "production",
-    "Project": "bioinformatics-pipeline",
-    "Owner": "data-engineering",
-    "CostCenter": "research-dev"
-  },
-  "SecurityConfiguration": "glue-security-config",
-  "NotificationProperty": {
-    "NotifyDelayAfter": 60
-  }
+  "NumberOfWorkers": 10,
+  "WorkerType": "G.1X"
 }

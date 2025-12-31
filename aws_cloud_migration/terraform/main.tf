@@ -1,5 +1,4 @@
-# Main Terraform Configuration for Bioinformatics Pipeline
-# This file configures the AWS provider and backend for state management
+# Terraform configuration for AWS bioinformatics infrastructure
 
 terraform {
   required_version = ">= 1.0"
@@ -10,31 +9,45 @@ terraform {
       version = "~> 5.0"
     }
   }
-  
-  # S3 backend for state management
-  backend "s3" {
-    bucket         = "bioinformatics-terraform-state"
-    key            = "pipeline/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "terraform-state-lock"
-  }
 }
 
-# AWS Provider Configuration
 provider "aws" {
   region = var.aws_region
+}
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "project_name" {
+  description = "Project name"
+  type        = string
+  default     = "bioinformatics"
+}
+
+# S3 bucket for data lake
+resource "aws_s3_bucket" "data_lake" {
+  bucket = "${var.project_name}-data-lake"
   
-  default_tags {
-    tags = {
-      Project     = "bioinformatics-pipeline"
-      Environment = var.environment
-      ManagedBy   = "Terraform"
-      Owner       = "data-science-team"
-    }
+  tags = {
+    Name    = "Bioinformatics Data Lake"
+    Project = var.project_name
   }
 }
 
-# Data sources
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
+# S3 bucket versioning
+resource "aws_s3_bucket_versioning" "data_lake" {
+  bucket = aws_s3_bucket.data_lake.id
+  
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Output values
+output "data_lake_bucket" {
+  value       = aws_s3_bucket.data_lake.id
+  description = "S3 data lake bucket name"
+}
