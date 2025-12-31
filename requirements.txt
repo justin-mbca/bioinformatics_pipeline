@@ -2,6 +2,8 @@ pandas
 matplotlib
 numpy
 snakemake
+pytest
+pytest-cov
 
 # Optional clinical/orchestration deps
 # pydantic for schema validation, prefect for orchestration
