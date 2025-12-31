@@ -2,6 +2,9 @@ pandas
 matplotlib
 numpy
 snakemake
+pulp<2.8  # Pin pulp version for snakemake compatibility
+pytest
+pytest-cov
 
 # Optional clinical/orchestration deps
 # pydantic for schema validation, prefect for orchestration
