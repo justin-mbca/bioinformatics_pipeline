@@ -1,0 +1,13 @@
+# ECS Container Requirements
+numpy==1.24.3
+pandas==2.0.2
+scipy==1.10.1
+scikit-learn==1.2.2
+matplotlib==3.7.1
+seaborn==0.12.2
+biopython==1.81
+pysam==0.21.0
+HTSeq==2.0.2
+statsmodels==0.14.0
+boto3==1.26.137
+botocore==1.29.137
