@@ -1,0 +1,29 @@
+# Dockerfile for RNA-Seq Analysis Pipeline
+FROM python:3.9-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    make \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Install Python dependencies
+RUN pip install --no-cache-dir \
+    numpy \
+    pandas \
+    biopython \
+    pysam \
+    scipy
+
+# Copy analysis scripts
+COPY scripts/ /app/scripts/
+
+# Set environment variable for test mode
+ENV TEST_MODE=false
+
+# Default command
+CMD ["python", "-c", "print('RNA-Seq container ready')"]

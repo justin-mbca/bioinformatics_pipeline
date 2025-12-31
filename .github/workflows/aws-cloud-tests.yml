@@ -1,0 +1,105 @@
+name: AWS Cloud Migration Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'aws_cloud_migration/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'aws_cloud_migration/**'
+
+jobs:
+  local-tests:
+    name: Local Tests (No AWS)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3 pandas numpy biopython pytest pytest-cov moto
+      
+      - name: Run local tests
+        run: |
+          cd aws_cloud_migration
+          bash scripts/run_local_tests.sh
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./aws_cloud_migration/coverage.xml
+  
+  terraform-validate:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+      
+      - name: Terraform Format Check
+        run: |
+          cd aws_cloud_migration/terraform
+          terraform fmt -check -recursive
+      
+      - name: Terraform Init
+        run: |
+          cd aws_cloud_migration/terraform
+          terraform init -backend=false
+      
+      - name: Terraform Validate
+        run: |
+          cd aws_cloud_migration/terraform
+          terraform validate
+  
+  docker-build:
+    name: Docker Container Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Build RNA-Seq Container
+        run: |
+          cd aws_cloud_migration/ecs_containers
+          docker build -t rnaseq-pipeline:test -f Dockerfile.rnaseq .
+      
+      - name: Test Container
+        run: |
+          docker run --rm -e TEST_MODE=true rnaseq-pipeline:test python -c "print('Container works')"
+  
+  aws-integration:
+    name: AWS Integration Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Run AWS Tests
+        run: |
+          cd aws_cloud_migration
+          bash scripts/run_aws_tests.sh
