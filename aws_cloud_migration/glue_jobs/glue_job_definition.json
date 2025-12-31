@@ -1,0 +1,21 @@
+{
+  "Name": "bioinformatics-etl-job",
+  "Role": "arn:aws:iam::ACCOUNT_ID:role/GlueServiceRole",
+  "Command": {
+    "Name": "glueetl",
+    "ScriptLocation": "s3://bioinformatics-scripts/glue_jobs/rnaseq_etl.py",
+    "PythonVersion": "3"
+  },
+  "DefaultArguments": {
+    "--TempDir": "s3://bioinformatics-temp/",
+    "--job-bookmark-option": "job-bookmark-enable",
+    "--enable-metrics": "true",
+    "--enable-spark-ui": "true",
+    "--spark-event-logs-path": "s3://bioinformatics-logs/spark-logs/"
+  },
+  "MaxRetries": 1,
+  "Timeout": 120,
+  "GlueVersion": "4.0",
+  "NumberOfWorkers": 10,
+  "WorkerType": "G.1X"
+}

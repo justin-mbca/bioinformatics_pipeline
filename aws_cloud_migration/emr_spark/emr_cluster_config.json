@@ -1,0 +1,28 @@
+{
+  "Name": "bioinformatics-emr-cluster",
+  "ReleaseLabel": "emr-6.10.0",
+  "Applications": [
+    {"Name": "Spark"},
+    {"Name": "Hadoop"},
+    {"Name": "Hive"}
+  ],
+  "Instances": {
+    "MasterInstanceType": "m5.xlarge",
+    "SlaveInstanceType": "m5.xlarge",
+    "InstanceCount": 3,
+    "KeepJobFlowAliveWhenNoSteps": true,
+    "TerminationProtected": false,
+    "Ec2SubnetId": "subnet-xxxxx"
+  },
+  "BootstrapActions": [],
+  "Steps": [],
+  "Tags": [
+    {
+      "Key": "Project",
+      "Value": "Bioinformatics"
+    }
+  ],
+  "VisibleToAllUsers": true,
+  "JobFlowRole": "EMR_EC2_DefaultRole",
+  "ServiceRole": "EMR_DefaultRole"
+}
