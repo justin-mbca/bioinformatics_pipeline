@@ -1,0 +1,278 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template for bioinformatics pipeline Lambda functions
+
+Globals:
+  Function:
+    Timeout: 300
+    MemorySize: 512
+    Runtime: python3.9
+    Environment:
+      Variables:
+        LOG_LEVEL: INFO
+
+Parameters:
+  S3BucketName:
+    Type: String
+    Default: bioinformatics-pipeline
+    Description: S3 bucket name for pipeline data
+  
+  GlueJobName:
+    Type: String
+    Default: rnaseq-etl-pipeline
+    Description: Name of the Glue ETL job
+  
+  GlueDatabase:
+    Type: String
+    Default: rnaseq_db
+    Description: Glue database name
+  
+  GlueTable:
+    Type: String
+    Default: raw_counts
+    Description: Glue table name
+  
+  EmailAddress:
+    Type: String
+    Description: Email address for SNS notifications
+    Default: data-team@example.com
+
+Resources:
+  # SNS Topic for notifications
+  DataQualityTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: bioinformatics-data-quality
+      DisplayName: Bioinformatics Data Quality Notifications
+      Subscription:
+        - Endpoint: !Ref EmailAddress
+          Protocol: email
+
+  # Lambda Execution Role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub 'arn:aws:s3:::${S3BucketName}/*'
+                  - !Sub 'arn:aws:s3:::${S3BucketName}'
+        - PolicyName: GlueAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - glue:StartJobRun
+                  - glue:GetJobRun
+                  - glue:GetJobRuns
+                  - glue:BatchStopJobRun
+                Resource: '*'
+        - PolicyName: SNSAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Ref DataQualityTopic
+
+  # Lambda Function: Trigger Pipeline
+  TriggerPipelineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: bioinformatics-trigger-pipeline
+      CodeUri: ./
+      Handler: trigger_pipeline.lambda_handler
+      Description: Triggers Glue ETL job when new RNA-Seq files are uploaded
+      Environment:
+        Variables:
+          GLUE_JOB_NAME: !Ref GlueJobName
+          GLUE_DATABASE: !Ref GlueDatabase
+          GLUE_TABLE: !Ref GlueTable
+          OUTPUT_BUCKET: !Ref S3BucketName
+          COUNT_THRESHOLD: '10'
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref PipelineBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: raw/counts/
+                  - Name: suffix
+                    Value: .csv
+      Tags:
+        Environment: production
+        Project: bioinformatics-pipeline
+
+  # Lambda Function: Data Quality Check
+  DataQualityCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: bioinformatics-data-quality-check
+      CodeUri: ./
+      Handler: data_quality_check.lambda_handler
+      Description: Validates RNA-Seq data files for quality issues
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref DataQualityTopic
+          MAX_MISSING_PERCENT: '10.0'
+          MIN_SAMPLE_COUNT: '3'
+          REQUIRED_COLUMNS: 'gene_id,gene_name'
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref PipelineBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: raw/counts/
+      Tags:
+        Environment: production
+        Project: bioinformatics-pipeline
+
+  # S3 Bucket for pipeline data
+  PipelineBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToIA
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: STANDARD_IA
+              - TransitionInDays: 90
+                StorageClass: GLACIER
+          - Id: ExpireLogs
+            Status: Enabled
+            Prefix: logs/
+            ExpirationInDays: 90
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: production
+        - Key: Project
+          Value: bioinformatics-pipeline
+
+  # CloudWatch Log Groups
+  TriggerPipelineLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${TriggerPipelineFunction}'
+      RetentionInDays: 30
+
+  DataQualityCheckLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${DataQualityCheckFunction}'
+      RetentionInDays: 30
+
+  # CloudWatch Alarms
+  TriggerPipelineErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: bioinformatics-trigger-pipeline-errors
+      AlarmDescription: Alert when trigger pipeline function has errors
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref TriggerPipelineFunction
+      TreatMissingData: notBreaching
+      ActionsEnabled: true
+      AlarmActions:
+        - !Ref DataQualityTopic
+
+  DataQualityCheckErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: bioinformatics-data-quality-check-errors
+      AlarmDescription: Alert when data quality check function has errors
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref DataQualityCheckFunction
+      TreatMissingData: notBreaching
+      ActionsEnabled: true
+      AlarmActions:
+        - !Ref DataQualityTopic
+
+Outputs:
+  TriggerPipelineFunctionArn:
+    Description: ARN of trigger pipeline Lambda function
+    Value: !GetAtt TriggerPipelineFunction.Arn
+    Export:
+      Name: bioinformatics-trigger-pipeline-arn
+
+  DataQualityCheckFunctionArn:
+    Description: ARN of data quality check Lambda function
+    Value: !GetAtt DataQualityCheckFunction.Arn
+    Export:
+      Name: bioinformatics-data-quality-check-arn
+
+  DataQualityTopicArn:
+    Description: ARN of SNS topic for notifications
+    Value: !Ref DataQualityTopic
+    Export:
+      Name: bioinformatics-data-quality-topic-arn
+
+  PipelineBucketName:
+    Description: Name of S3 bucket for pipeline data
+    Value: !Ref PipelineBucket
+    Export:
+      Name: bioinformatics-pipeline-bucket
+
+  LambdaExecutionRoleArn:
+    Description: ARN of Lambda execution role
+    Value: !GetAtt LambdaExecutionRole.Arn
+    Export:
+      Name: bioinformatics-lambda-execution-role-arn

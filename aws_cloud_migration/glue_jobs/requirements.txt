@@ -1,0 +1,10 @@
+# AWS Glue ETL Job Requirements
+# Note: AWS Glue jobs run on managed Spark clusters with pre-installed libraries
+# These are additional Python packages that need to be installed
+
+boto3>=1.26.0
+botocore>=1.29.0
+
+# Glue libraries are pre-installed on AWS Glue
+# awsglue (pre-installed)
+# pyspark (pre-installed)
