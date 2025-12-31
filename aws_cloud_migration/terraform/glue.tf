@@ -82,10 +82,10 @@ resource "aws_glue_job" "rnaseq_etl" {
     "--count_threshold"                  = "10"
   }
 
-  max_retries  = 1
-  timeout      = 2880
-  glue_version = "4.0"
-  worker_type  = "G.1X"
+  max_retries       = 1
+  timeout           = 2880
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
   number_of_workers = 5
 
   execution_property {
@@ -103,7 +103,7 @@ resource "aws_glue_crawler" "raw_counts" {
     path = "s3://${aws_s3_bucket.data_lake.id}/raw/counts/"
   }
 
-  schedule = "cron(0 2 * * ? *)"  # Daily at 2 AM
+  schedule = "cron(0 2 * * ? *)" # Daily at 2 AM
 
   schema_change_policy {
     delete_behavior = "LOG"

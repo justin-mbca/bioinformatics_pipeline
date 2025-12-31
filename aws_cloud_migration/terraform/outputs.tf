@@ -70,12 +70,12 @@ output "emr_instance_profile_arn" {
 output "deployment_summary" {
   description = "Summary of deployed resources"
   value = {
-    region                = var.aws_region
-    environment           = var.environment
-    s3_bucket             = aws_s3_bucket.data_lake.id
-    glue_database         = aws_glue_catalog_database.rnaseq_db.name
-    emr_cluster          = aws_emr_cluster.bioinformatics.id
-    lambda_functions     = [
+    region        = var.aws_region
+    environment   = var.environment
+    s3_bucket     = aws_s3_bucket.data_lake.id
+    glue_database = aws_glue_catalog_database.rnaseq_db.name
+    emr_cluster   = aws_emr_cluster.bioinformatics.id
+    lambda_functions = [
       aws_lambda_function.trigger_pipeline.function_name,
       aws_lambda_function.data_quality_check.function_name
     ]

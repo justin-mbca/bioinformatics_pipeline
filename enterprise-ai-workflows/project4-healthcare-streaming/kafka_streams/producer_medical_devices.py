@@ -12,10 +12,10 @@ from kafka import KafkaProducer
 def generate_vital_signs(patient_id):
     """
     Generate simulated vital signs data
-    
+
     Args:
         patient_id: Patient identifier
-        
+
     Returns:
         Dictionary with vital signs data
     """
@@ -36,7 +36,7 @@ def generate_vital_signs(patient_id):
 def send_to_kafka(producer, topic, message):
     """
     Send message to Kafka topic
-    
+
     Args:
         producer: KafkaProducer instance
         topic: Topic name
@@ -51,12 +51,12 @@ if __name__ == "__main__":
         bootstrap_servers=['localhost:9092'],
         value_serializer=lambda v: json.dumps(v).encode('utf-8')
     )
-    
+
     for i in range(10):
         message = generate_vital_signs(f"patient-{i}")
         send_to_kafka(producer, 'medical-devices-vitals', message)
         print(f"Sent message for patient-{i}")
         time.sleep(1)
-    
+
     producer.flush()
     producer.close()

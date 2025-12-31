@@ -106,7 +106,7 @@ resource "aws_emr_cluster" "bioinformatics" {
   service_role = aws_iam_role.emr_service_role.arn
 
   ec2_attributes {
-    instance_profile = aws_iam_instance_profile.emr_instance_profile.arn
+    instance_profile                  = aws_iam_instance_profile.emr_instance_profile.arn
     emr_managed_master_security_group = aws_security_group.emr_master.id
     emr_managed_slave_security_group  = aws_security_group.emr_core.id
   }
@@ -179,10 +179,10 @@ resource "aws_emr_cluster" "bioinformatics" {
     {
       Classification = "spark-defaults"
       Properties = {
-        "spark.dynamicAllocation.enabled"            = "true"
-        "spark.shuffle.service.enabled"              = "true"
-        "spark.sql.adaptive.enabled"                 = "true"
-        "spark.serializer"                           = "org.apache.spark.serializer.KryoSerializer"
+        "spark.dynamicAllocation.enabled" = "true"
+        "spark.shuffle.service.enabled"   = "true"
+        "spark.sql.adaptive.enabled"      = "true"
+        "spark.serializer"                = "org.apache.spark.serializer.KryoSerializer"
       }
     }
   ])

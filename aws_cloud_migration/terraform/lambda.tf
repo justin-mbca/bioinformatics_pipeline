@@ -2,7 +2,7 @@
 
 # SNS Topic for notifications
 resource "aws_sns_topic" "data_quality" {
-  name = "bioinformatics-data-quality"
+  name         = "bioinformatics-data-quality"
   display_name = "Bioinformatics Data Quality Notifications"
 }
 

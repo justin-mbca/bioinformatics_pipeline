@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "data_lake" {
   tags = merge(
     var.tags,
     {
-      Name = var.s3_bucket_name
+      Name    = var.s3_bucket_name
       Purpose = "Data Lake for bioinformatics pipeline"
     }
   )
@@ -100,7 +100,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
 # S3 Bucket Logging (optional)
 resource "aws_s3_bucket_logging" "data_lake" {
   count = var.enable_logging ? 1 : 0
-  
+
   bucket = aws_s3_bucket.data_lake.id
 
   target_bucket = aws_s3_bucket.data_lake.id
@@ -115,10 +115,10 @@ resource "aws_s3_bucket_policy" "data_lake" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "DenyInsecureTransport"
-        Effect = "Deny"
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
         Principal = "*"
-        Action = "s3:*"
+        Action    = "s3:*"
         Resource = [
           aws_s3_bucket.data_lake.arn,
           "${aws_s3_bucket.data_lake.arn}/*"

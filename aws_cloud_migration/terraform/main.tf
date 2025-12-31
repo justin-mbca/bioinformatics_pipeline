@@ -2,7 +2,7 @@
 
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -30,7 +30,7 @@ variable "project_name" {
 # S3 bucket for data lake
 resource "aws_s3_bucket" "data_lake" {
   bucket = "${var.project_name}-data-lake"
-  
+
   tags = {
     Name    = "Bioinformatics Data Lake"
     Project = var.project_name
@@ -40,7 +40,7 @@ resource "aws_s3_bucket" "data_lake" {
 # S3 bucket versioning
 resource "aws_s3_bucket_versioning" "data_lake" {
   bucket = aws_s3_bucket.data_lake.id
-  
+
   versioning_configuration {
     status = "Enabled"
   }
