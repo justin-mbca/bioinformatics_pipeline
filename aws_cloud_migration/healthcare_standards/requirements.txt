@@ -1,0 +1,11 @@
+# Healthcare Data Standards Requirements
+
+# FHIR Client library (optional, for more advanced FHIR operations)
+# fhirclient>=4.1.0
+
+# HL7 parsing (our custom implementation doesn't require external libraries)
+
+# OMOP CDM (no specific library required, we generate SQL)
+
+# General dependencies
+python-dateutil>=2.8.2

@@ -1,0 +1,78 @@
+FROM python:3.9-slim
+
+# Metadata
+LABEL maintainer="bioinformatics-team@example.com"
+LABEL description="Docker image for RNA-Seq analysis with bioinformatics tools"
+LABEL version="1.0.0"
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    gfortran \
+    libz-dev \
+    libbz2-dev \
+    liblzma-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    git \
+    wget \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create working directory
+WORKDIR /app
+
+# Install Python bioinformatics packages
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Install additional bioinformatics tools
+RUN pip install --no-cache-dir \
+    numpy==1.24.3 \
+    pandas==2.0.2 \
+    scipy==1.10.1 \
+    scikit-learn==1.2.2 \
+    matplotlib==3.7.1 \
+    seaborn==0.12.2 \
+    biopython==1.81 \
+    pysam==0.21.0 \
+    HTSeq==2.0.2 \
+    statsmodels==0.14.0 \
+    boto3==1.26.137
+
+# Create directories for input/output
+RUN mkdir -p /app/data /app/results /app/logs /app/scripts
+
+# Copy analysis scripts
+COPY scripts/ /app/scripts/
+RUN chmod +x /app/scripts/*.py
+
+# Set Python path
+ENV PYTHONPATH=/app:/app/scripts:$PYTHONPATH
+
+# Create non-root user for security
+RUN groupadd -r bioinfo && \
+    useradd -r -g bioinfo -u 1000 -m -s /bin/bash bioinfo && \
+    chown -R bioinfo:bioinfo /app
+
+# Switch to non-root user
+USER bioinfo
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import sys; sys.exit(0)" || exit 1
+
+# Default command (can be overridden)
+ENTRYPOINT ["python"]
+CMD ["/app/scripts/analysis_entrypoint.py"]
