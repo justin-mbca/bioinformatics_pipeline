@@ -1,0 +1,124 @@
+{
+  "Rules": [
+    {
+      "Id": "TransitionRawDataToIA",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "raw/"
+      },
+      "Transitions": [
+        {
+          "Days": 30,
+          "StorageClass": "STANDARD_IA"
+        },
+        {
+          "Days": 90,
+          "StorageClass": "GLACIER_IR"
+        },
+        {
+          "Days": 180,
+          "StorageClass": "DEEP_ARCHIVE"
+        }
+      ],
+      "NoncurrentVersionTransitions": [
+        {
+          "NoncurrentDays": 30,
+          "StorageClass": "STANDARD_IA"
+        },
+        {
+          "NoncurrentDays": 60,
+          "StorageClass": "GLACIER_IR"
+        }
+      ]
+    },
+    {
+      "Id": "TransitionProcessedDataToIA",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "processed/"
+      },
+      "Transitions": [
+        {
+          "Days": 60,
+          "StorageClass": "STANDARD_IA"
+        },
+        {
+          "Days": 180,
+          "StorageClass": "GLACIER_IR"
+        }
+      ]
+    },
+    {
+      "Id": "ArchiveResults",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "results/"
+      },
+      "Transitions": [
+        {
+          "Days": 90,
+          "StorageClass": "GLACIER_IR"
+        },
+        {
+          "Days": 365,
+          "StorageClass": "DEEP_ARCHIVE"
+        }
+      ]
+    },
+    {
+      "Id": "ExpireGlueTempFiles",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "glue-temp/"
+      },
+      "Expiration": {
+        "Days": 7
+      },
+      "AbortIncompleteMultipartUpload": {
+        "DaysAfterInitiation": 1
+      }
+    },
+    {
+      "Id": "ExpireApplicationLogs",
+      "Status": "Enabled",
+      "Filter": {
+        "And": {
+          "Prefix": "logs/",
+          "Tags": [
+            {
+              "Key": "LogType",
+              "Value": "application"
+            }
+          ]
+        }
+      },
+      "Expiration": {
+        "Days": 90
+      }
+    },
+    {
+      "Id": "ExpireDebugLogs",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "logs/debug/"
+      },
+      "Expiration": {
+        "Days": 30
+      }
+    },
+    {
+      "Id": "ExpireOldVersions",
+      "Status": "Enabled",
+      "NoncurrentVersionExpiration": {
+        "NoncurrentDays": 90
+      }
+    },
+    {
+      "Id": "AbortIncompleteMultipartUploads",
+      "Status": "Enabled",
+      "AbortIncompleteMultipartUpload": {
+        "DaysAfterInitiation": 7
+      }
+    }
+  ]
+}

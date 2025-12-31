@@ -163,12 +163,38 @@ Download the small example integrated report (CSV): [docs/report_example.csv](do
 
 ---
 
+## ☁️ AWS Cloud Migration
+
+This pipeline now supports AWS cloud deployment with enterprise-grade infrastructure:
+
+- **AWS Glue**: Serverless ETL for processing RNA-Seq data
+- **AWS EMR**: Spark-based large-scale differential expression analysis
+- **AWS Lambda**: Event-driven pipeline automation
+- **AWS S3**: Scalable data lake for genomics datasets
+- **AWS ECS/Fargate**: Containerized analysis workflows
+- **Terraform**: Complete Infrastructure as Code
+
+### Healthcare Data Standards
+
+Production-ready integration with healthcare data formats:
+- **FHIR R4**: Genomic observations and patient data
+- **HL7 v2**: Clinical lab results integration  
+- **OMOP CDM**: Common data model for research cohorts
+
+See [`aws_cloud_migration/`](./aws_cloud_migration/) for implementation details and deployment guides.
+
+### Key Features
+- Serverless and auto-scaling architecture
+- HIPAA-compliant data handling
+- Cost-optimized storage lifecycle policies
+- Comprehensive monitoring and logging
+- Enterprise security best practices
+
 ## 🔮 Future Roadmap
 
 This repository is designed for extensibility. Planned enhancements include:
 *   **Multi-omics Integration:** Support for proteomics, metabolomics, and ATAC-seq data.
 *   **Advanced Visualization:** Enhanced interactive dashboards for integrated data exploration.
-*   **Cloud/HPC Support:** Scale analyses on cloud platforms and high-performance clusters.
 *   **Automated Reporting:** Generate comprehensive HTML/PDF reports for sharing insights.
 *   **Parameter Sweeps:** Tools for automated large-scale batch analysis and optimization.
 

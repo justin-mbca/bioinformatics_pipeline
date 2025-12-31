@@ -1,0 +1,139 @@
+name: Streaming Infrastructure Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'enterprise-ai-workflows/project4-healthcare-streaming/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'enterprise-ai-workflows/project4-healthcare-streaming/**'
+
+jobs:
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install linters
+        run: |
+          pip install flake8 black isort mypy
+      
+      - name: Run flake8
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          flake8 . --max-line-length=120 --exclude=.venv
+      
+      - name: Check black formatting
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          black --check .
+      
+      - name: Check import sorting
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          isort --check-only .
+  
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          pip install -r tests/requirements.txt
+          pip install pytest pytest-cov pytest-mock
+      
+      - name: Run unit tests
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          pytest tests/unit/ -v --cov=. --cov-report=xml
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+  
+  integration-tests:
+    name: Integration Tests (Docker)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Start Docker Compose
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          docker-compose up -d
+      
+      - name: Wait for services
+        run: sleep 60
+      
+      - name: Run integration tests
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          bash scripts/run_local_tests.sh
+      
+      - name: Collect logs
+        if: failure()
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          docker-compose logs > docker-logs.txt
+      
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-logs
+          path: enterprise-ai-workflows/project4-healthcare-streaming/docker-logs.txt
+      
+      - name: Stop Docker Compose
+        if: always()
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming
+          docker-compose down -v
+  
+  aws-deployment:
+    name: AWS Deployment Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      
+      - name: Terraform Init
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming/terraform_aws
+          terraform init
+      
+      - name: Terraform Plan
+        run: |
+          cd enterprise-ai-workflows/project4-healthcare-streaming/terraform_aws
+          terraform plan -out=tfplan

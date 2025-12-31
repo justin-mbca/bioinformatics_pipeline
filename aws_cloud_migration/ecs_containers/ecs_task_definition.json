@@ -1,0 +1,92 @@
+{
+  "family": "bioinformatics-rnaseq-analysis",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "2048",
+  "memory": "8192",
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "rnaseq-analysis",
+      "image": "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/bioinformatics-rnaseq:latest",
+      "essential": true,
+      "cpu": 2048,
+      "memory": 8192,
+      "memoryReservation": 7168,
+      "portMappings": [],
+      "environment": [
+        {
+          "name": "AWS_DEFAULT_REGION",
+          "value": "us-east-1"
+        },
+        {
+          "name": "S3_BUCKET",
+          "value": "bioinformatics-pipeline"
+        },
+        {
+          "name": "INPUT_PATH",
+          "value": "/data/input"
+        },
+        {
+          "name": "OUTPUT_PATH",
+          "value": "/data/output"
+        },
+        {
+          "name": "LOG_LEVEL",
+          "value": "INFO"
+        }
+      ],
+      "secrets": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/bioinformatics-rnaseq",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "rnaseq-analysis",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "python -c 'import sys; sys.exit(0)' || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "ulimits": [
+        {
+          "name": "nofile",
+          "softLimit": 65536,
+          "hardLimit": 65536
+        }
+      ],
+      "stopTimeout": 120
+    }
+  ],
+  "volumes": [],
+  "placementConstraints": [],
+  "tags": [
+    {
+      "key": "Environment",
+      "value": "production"
+    },
+    {
+      "key": "Project",
+      "value": "bioinformatics-pipeline"
+    },
+    {
+      "key": "ManagedBy",
+      "value": "terraform"
+    }
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}
