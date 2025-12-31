@@ -1,0 +1,208 @@
+{
+  "Name": "bioinformatics-deseq2-cluster",
+  "ReleaseLabel": "emr-6.10.0",
+  "Applications": [
+    {
+      "Name": "Spark"
+    },
+    {
+      "Name": "Hadoop"
+    },
+    {
+      "Name": "Hive"
+    },
+    {
+      "Name": "Livy"
+    },
+    {
+      "Name": "JupyterHub"
+    }
+  ],
+  "Configurations": [
+    {
+      "Classification": "spark",
+      "Properties": {
+        "maximizeResourceAllocation": "true"
+      }
+    },
+    {
+      "Classification": "spark-defaults",
+      "Properties": {
+        "spark.dynamicAllocation.enabled": "true",
+        "spark.shuffle.service.enabled": "true",
+        "spark.sql.adaptive.enabled": "true",
+        "spark.sql.adaptive.coalescePartitions.enabled": "true",
+        "spark.serializer": "org.apache.spark.serializer.KryoSerializer",
+        "spark.speculation": "true",
+        "spark.network.timeout": "800s",
+        "spark.executor.heartbeatInterval": "60s"
+      }
+    },
+    {
+      "Classification": "spark-env",
+      "Configurations": [
+        {
+          "Classification": "export",
+          "Properties": {
+            "PYSPARK_PYTHON": "/usr/bin/python3",
+            "PYSPARK_DRIVER_PYTHON": "/usr/bin/python3"
+          }
+        }
+      ]
+    },
+    {
+      "Classification": "yarn-site",
+      "Properties": {
+        "yarn.nodemanager.vmem-check-enabled": "false",
+        "yarn.nodemanager.pmem-check-enabled": "false"
+      }
+    }
+  ],
+  "Instances": {
+    "InstanceGroups": [
+      {
+        "Name": "Master",
+        "Market": "ON_DEMAND",
+        "InstanceRole": "MASTER",
+        "InstanceType": "m5.xlarge",
+        "InstanceCount": 1,
+        "EbsConfiguration": {
+          "EbsBlockDeviceConfigs": [
+            {
+              "VolumeSpecification": {
+                "VolumeType": "gp3",
+                "SizeInGB": 100,
+                "Iops": 3000
+              },
+              "VolumesPerInstance": 1
+            }
+          ],
+          "EbsOptimized": true
+        }
+      },
+      {
+        "Name": "Core",
+        "Market": "ON_DEMAND",
+        "InstanceRole": "CORE",
+        "InstanceType": "r5.xlarge",
+        "InstanceCount": 3,
+        "EbsConfiguration": {
+          "EbsBlockDeviceConfigs": [
+            {
+              "VolumeSpecification": {
+                "VolumeType": "gp3",
+                "SizeInGB": 200,
+                "Iops": 3000
+              },
+              "VolumesPerInstance": 1
+            }
+          ],
+          "EbsOptimized": true
+        },
+        "AutoScalingPolicy": {
+          "Constraints": {
+            "MinCapacity": 2,
+            "MaxCapacity": 10
+          },
+          "Rules": [
+            {
+              "Name": "ScaleUpOnYARNMemory",
+              "Description": "Scale up when YARN memory usage is high",
+              "Action": {
+                "SimpleScalingPolicyConfiguration": {
+                  "AdjustmentType": "CHANGE_IN_CAPACITY",
+                  "ScalingAdjustment": 2,
+                  "CoolDown": 300
+                }
+              },
+              "Trigger": {
+                "CloudWatchAlarmDefinition": {
+                  "ComparisonOperator": "GREATER_THAN",
+                  "EvaluationPeriods": 2,
+                  "MetricName": "YARNMemoryAvailablePercentage",
+                  "Namespace": "AWS/ElasticMapReduce",
+                  "Period": 300,
+                  "Statistic": "AVERAGE",
+                  "Threshold": 75.0,
+                  "Unit": "PERCENT"
+                }
+              }
+            },
+            {
+              "Name": "ScaleDownOnYARNMemory",
+              "Description": "Scale down when YARN memory usage is low",
+              "Action": {
+                "SimpleScalingPolicyConfiguration": {
+                  "AdjustmentType": "CHANGE_IN_CAPACITY",
+                  "ScalingAdjustment": -1,
+                  "CoolDown": 300
+                }
+              },
+              "Trigger": {
+                "CloudWatchAlarmDefinition": {
+                  "ComparisonOperator": "LESS_THAN",
+                  "EvaluationPeriods": 2,
+                  "MetricName": "YARNMemoryAvailablePercentage",
+                  "Namespace": "AWS/ElasticMapReduce",
+                  "Period": 300,
+                  "Statistic": "AVERAGE",
+                  "Threshold": 25.0,
+                  "Unit": "PERCENT"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "Ec2KeyName": "emr-key-pair",
+    "KeepJobFlowAliveWhenNoSteps": true,
+    "TerminationProtected": false,
+    "Ec2SubnetId": "subnet-xxxxxxxx"
+  },
+  "BootstrapActions": [
+    {
+      "Name": "Install Bioinformatics Packages",
+      "ScriptBootstrapAction": {
+        "Path": "s3://bioinformatics-pipeline/bootstrap/bootstrap_actions.sh"
+      }
+    }
+  ],
+  "Steps": [],
+  "VisibleToAllUsers": true,
+  "JobFlowRole": "EMR_EC2_DefaultRole",
+  "ServiceRole": "EMR_DefaultRole",
+  "Tags": [
+    {
+      "Key": "Environment",
+      "Value": "production"
+    },
+    {
+      "Key": "Project",
+      "Value": "bioinformatics-pipeline"
+    },
+    {
+      "Key": "Owner",
+      "Value": "data-science"
+    },
+    {
+      "Key": "CostCenter",
+      "Value": "research-dev"
+    }
+  ],
+  "ScaleDownBehavior": "TERMINATE_AT_TASK_COMPLETION",
+  "LogUri": "s3://bioinformatics-pipeline/logs/emr/",
+  "ManagedScalingPolicy": {
+    "ComputeLimits": {
+      "UnitType": "Instances",
+      "MinimumCapacityUnits": 2,
+      "MaximumCapacityUnits": 10,
+      "MaximumOnDemandCapacityUnits": 10,
+      "MaximumCoreCapacityUnits": 10
+    }
+  },
+  "StepConcurrencyLevel": 2,
+  "AutoTerminationPolicy": {
+    "IdleTimeout": 3600
+  }
+}
