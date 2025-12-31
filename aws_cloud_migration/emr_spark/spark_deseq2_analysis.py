@@ -9,7 +9,8 @@ calculation, and statistical testing at scale.
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import (
     col, log, exp, sum as _sum, mean as _mean, stddev, count, lit,
-    when, abs as _abs, pow as _pow, sqrt
+    when, abs as _abs, pow as _pow, sqrt, array, stddev_samp, row_number,
+    count as _count, min as _min
 )
 from pyspark.sql.window import Window
 from pyspark.sql.types import DoubleType, StringType, StructType, StructField, IntegerType
@@ -211,9 +212,6 @@ class DESeq2SparkAnalyzer:
         # Calculate pooled standard error
         # This is a simplified version - production would use more sophisticated methods
         
-        # Standard deviation for each condition
-        from pyspark.sql.functions import array, stddev_samp
-        
         # Create arrays of values for each condition
         df = df.withColumn("cond1_values", array(*[col(c) for c in cond1_cols]))
         df = df.withColumn("cond2_values", array(*[col(c) for c in cond2_cols]))
@@ -262,9 +260,6 @@ class DESeq2SparkAnalyzer:
             DataFrame with adjusted p-values
         """
         logger.info("Applying Benjamini-Hochberg FDR correction")
-        
-        from pyspark.sql.window import Window
-        from pyspark.sql.functions import row_number, count as _count, min as _min
         
         # Total number of tests
         n_tests = df.count()

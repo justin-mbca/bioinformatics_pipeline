@@ -124,26 +124,18 @@ def write_to_s3(df: DataFrame, output_path: str, glueContext: GlueContext) -> No
     
     try:
         # Convert DataFrame to DynamicFrame
-        dynamic_frame = glueContext.create_dynamic_frame.from_options(
-            connection_type="s3",
-            connection_options={"path": output_path},
-            format="parquet"
-        )
+        from awsglue.dynamicframe import DynamicFrame
+        
+        dynamic_frame = DynamicFrame.fromDF(df, glueContext, "filtered_data")
         
         # Write using Glue
         glueContext.write_dynamic_frame.from_options(
-            frame=glueContext.create_dynamic_frame_from_catalog(
-                database="temp_db",
-                table_name="temp_table"
-            ),
+            frame=dynamic_frame,
             connection_type="s3",
             connection_options={"path": output_path},
             format="parquet",
             transformation_ctx="datasink"
         )
-        
-        # Alternative: Direct write using Spark
-        df.write.mode("overwrite").parquet(output_path)
         
         logger.info(f"Successfully wrote data to {output_path}")
         

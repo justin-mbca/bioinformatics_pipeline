@@ -49,7 +49,7 @@ variable "lambda_timeout" {
 }
 
 variable "vpc_id" {
-  description = "VPC ID for resources"
+  description = "VPC ID for resources (REQUIRED for production - default VPC used if empty)"
   type        = string
   default     = ""
 }
@@ -61,9 +61,9 @@ variable "subnet_ids" {
 }
 
 variable "sns_email" {
-  description = "Email address for SNS notifications"
+  description = "Email address for SNS notifications (REQUIRED - update in terraform.tfvars)"
   type        = string
-  default     = "data-team@example.com"
+  default     = "CHANGEME-data-team@example.com"
 }
 
 variable "enable_versioning" {
