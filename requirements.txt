@@ -2,6 +2,9 @@ pandas
 matplotlib
 numpy
 snakemake
+pulp<=2.7.0  # Pin pulp to 2.7.0 for Snakemake compatibility (list_solvers API)
+pytest
+pytest-cov
 
 # Optional clinical/orchestration deps
 # pydantic for schema validation, prefect for orchestration
