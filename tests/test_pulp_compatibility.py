@@ -5,6 +5,10 @@ This test validates that the installed PuLP version has the list_solvers() metho
 that Snakemake requires, preventing AttributeError: module 'pulp' has no attribute 'list_solvers'.
 """
 import pulp
+from packaging import version
+
+# Maximum compatible PuLP version (must match requirements.txt)
+MAX_COMPATIBLE_VERSION = "2.7.0"
 
 
 def test_pulp_has_list_solvers():
@@ -29,10 +33,17 @@ def test_pulp_list_solvers_callable():
 
 def test_pulp_version():
     """Test that pulp version is 2.7.0 or earlier."""
-    version = pulp.__version__
-    major, minor = map(int, version.split('.')[:2])
+    pulp_version = pulp.__version__
     
-    assert (major, minor) <= (2, 7), (
-        f"PuLP version {version} may not be compatible with Snakemake. "
-        "Ensure pulp<=2.7.0 is installed."
-    )
+    try:
+        current = version.parse(pulp_version)
+        max_version = version.parse(MAX_COMPATIBLE_VERSION)
+        
+        assert current <= max_version, (
+            f"PuLP version {pulp_version} may not be compatible with Snakemake. "
+            f"Ensure pulp<={MAX_COMPATIBLE_VERSION} is installed."
+        )
+    except Exception as e:
+        raise AssertionError(
+            f"Failed to parse PuLP version '{pulp_version}': {e}"
+        )
